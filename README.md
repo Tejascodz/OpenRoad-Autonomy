@@ -19,6 +19,8 @@
 
 *Watch your autonomous robot navigate city streets in real-time with WebSocket-powered live tracking*
 
+![Dashboard Preview](1.png)
+
 </div>
 
 ---
@@ -63,7 +65,7 @@
 ✓ Delivery history tracking
 ✓ Emergency controls
 ```
-![Dashboard Preview](1.png)
+
 </td>
 </tr>
 </table>
