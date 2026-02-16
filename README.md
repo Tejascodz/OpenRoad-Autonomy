@@ -285,7 +285,7 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 <div align="center">
 
-![Path Planning Visualization](3.png)
+![Path Planning Visualization](4.png)
 
 *Compare A* and Dijkstra algorithms on real road networks with live visualization*
 
