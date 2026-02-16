@@ -227,18 +227,6 @@ python -c "from app.services.database_service import DatabaseService; DatabaseSe
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-<div align="center">
-
-### 🌐 Access Your Application
-
-| Service | URL | Description |
-|:--------|:----|:------------|
-| 🎨 **Dashboard** | [localhost:8000/static/index.html](http://localhost:8000/static/index.html) | Main control interface |
-| 📚 **API Docs** | [localhost:8000/docs](http://localhost:8000/docs) | Interactive API documentation |
-| ❤️ **Health Check** | [localhost:8000/health](http://localhost:8000/health) | System status |
-
-</div>
-
 ---
 
 ## 🎮 Usage Guide
