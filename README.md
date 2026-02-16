@@ -15,7 +15,7 @@
 
 ---
 
-![Dashboard Preview](https://via.placeholder.com/1200x500/1a1a2e/16213e?text=Real-Time+Robot+Tracking+Dashboard+%7C+Live+WebSocket+Updates+%7C+Interactive+Map+Visualization)
+![Dashboard Preview](1.png)
 
 *Watch your autonomous robot navigate city streets in real-time with WebSocket-powered live tracking*
 
