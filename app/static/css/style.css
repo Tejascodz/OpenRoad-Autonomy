@@ -1,0 +1,570 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    background: #f5f5f5;
+}
+
+.dashboard {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+header {
+    background: #2c3e50;
+    color: white;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    z-index: 1000;
+}
+
+header h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.status-bar {
+    display: flex;
+    gap: 2rem;
+}
+
+#connection-status, #robot-mode {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.2);
+    font-weight: 500;
+}
+
+.main-panel {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+.map-container {
+    flex: 2;
+    height: 100%;
+    position: relative;
+}
+
+#map {
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+/* Custom map controls */
+.leaflet-control-zoom {
+    border: none !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1) !important;
+}
+
+.leaflet-control-zoom a {
+    color: #2c3e50 !important;
+    background: white !important;
+    border: none !important;
+    width: 36px !important;
+    height: 36px !important;
+    line-height: 36px !important;
+    font-size: 18px !important;
+    transition: all 0.3s ease;
+}
+
+.leaflet-control-zoom a:hover {
+    background: #3498db !important;
+    color: white !important;
+}
+
+/* Recenter button */
+.recenter-button {
+    position: absolute;
+    top: 80px;
+    right: 10px;
+    z-index: 1000;
+}
+
+.recenter-button button {
+    width: auto;
+    padding: 10px 15px;
+    background: white;
+    color: #2c3e50;
+    border: 2px solid #3498db;
+    border-radius: 30px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+}
+
+.recenter-button button:hover {
+    background: #3498db;
+    color: white;
+    transform: scale(1.05);
+}
+
+.info-panel {
+    flex: 1;
+    background: white;
+    padding: 1.5rem;
+    overflow-y: auto;
+    box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+    z-index: 2;
+}
+
+.robot-stats, .delivery-controls, .emergency-controls {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #eee;
+}
+
+h2 {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+h2::before {
+    content: '●';
+    color: #3498db;
+    font-size: 1rem;
+}
+
+.stat {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    gap: 1rem;
+}
+
+.stat label {
+    width: 80px;
+    color: #666;
+    font-weight: 500;
+}
+
+.stat span {
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.progress-bar {
+    flex: 1;
+    height: 20px;
+    background: #ecf0f1;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3498db, #2980b9);
+    transition: width 0.3s ease;
+    border-radius: 10px;
+    position: relative;
+}
+
+.fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, rgba(255,255,255,0.2), transparent);
+    border-radius: 10px;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.25rem;
+    color: #666;
+    font-weight: 500;
+}
+
+.form-group input, .form-group select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    background: #fafafa;
+}
+
+.form-group input:focus, .form-group select:focus {
+    outline: none;
+    border-color: #3498db;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(52,152,219,0.1);
+}
+
+button {
+    width: 100%;
+    padding: 0.75rem;
+    background: #3498db;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+button:hover {
+    background: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+button.emergency {
+    background: #e74c3c;
+    margin-bottom: 0.5rem;
+}
+
+button.emergency:hover {
+    background: #c0392b;
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+.history-panel {
+    background: white;
+    padding: 1.5rem;
+    border-top: 2px solid #2c3e50;
+    max-height: 250px;
+    overflow-y: auto;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+}
+
+.history-panel h2 {
+    margin-top: 0;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+th {
+    text-align: left;
+    padding: 0.75rem 0.5rem;
+    background: #ecf0f1;
+    color: #2c3e50;
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+td {
+    padding: 0.5rem;
+    border-bottom: 1px solid #eee;
+}
+
+tr:hover td {
+    background: #f5f9ff;
+}
+
+/* Custom marker styles */
+.custom-robot-marker {
+    position: relative;
+    z-index: 1000 !important;
+}
+
+.robot-icon {
+    font-size: 32px;
+    line-height: 1;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+    animation: robotBob 2s infinite ease-in-out;
+    transform-origin: center;
+}
+
+.robot-pulse {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #3498db;
+    opacity: 0.5;
+    animation: pulse 2s infinite;
+    z-index: -1;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 0.6;
+    }
+    50% {
+        transform: scale(1.8);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 0.6;
+    }
+}
+
+@keyframes robotBob {
+    0%, 100% {
+        transform: translateY(0) scale(1);
+    }
+    50% {
+        transform: translateY(-5px) scale(1.05);
+    }
+}
+
+/* Path line styles */
+.leaflet-interactive {
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
+    transition: all 0.3s ease;
+}
+
+.leaflet-interactive:hover {
+    filter: drop-shadow(0 6px 8px rgba(0,0,0,0.3));
+    opacity: 1 !important;
+}
+
+/* Arrow marker */
+.arrow-marker {
+    color: #FF6B6B;
+    font-size: 18px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    transform-origin: center;
+    font-weight: bold;
+    animation: arrowPulse 1.5s infinite;
+}
+
+@keyframes arrowPulse {
+    0%, 100% {
+        opacity: 0.7;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.2);
+    }
+}
+
+/* Pickup and delivery markers */
+.pickup-marker, .delivery-marker {
+    transition: all 0.3s ease;
+    z-index: 500 !important;
+}
+
+.pickup-marker div, .delivery-marker div {
+    transition: all 0.3s ease;
+}
+
+.pickup-marker:hover div, .delivery-marker:hover div {
+    transform: scale(1.3);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.4) !important;
+}
+
+/* Leaflet popup customization */
+.leaflet-popup-content-wrapper {
+    border-radius: 8px;
+    padding: 0;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.2);
+}
+
+.leaflet-popup-content {
+    margin: 10px 15px;
+    font-weight: 500;
+    color: #2c3e50;
+}
+
+.leaflet-popup-tip {
+    box-shadow: 0 3px 15px rgba(0,0,0,0.2);
+}
+
+/* Status colors with better visibility */
+.status-pending { 
+    color: #f39c12; 
+    font-weight: 600;
+    background: rgba(243,156,18,0.1);
+    padding: 2px 8px;
+    border-radius: 12px;
+    display: inline-block;
+}
+.status-in_transit { 
+    color: #3498db; 
+    font-weight: 600;
+    background: rgba(52,152,219,0.1);
+    padding: 2px 8px;
+    border-radius: 12px;
+    display: inline-block;
+}
+.status-delivered { 
+    color: #27ae60; 
+    font-weight: 600;
+    background: rgba(39,174,96,0.1);
+    padding: 2px 8px;
+    border-radius: 12px;
+    display: inline-block;
+}
+.status-failed { 
+    color: #e74c3c; 
+    font-weight: 600;
+    background: rgba(231,76,60,0.1);
+    padding: 2px 8px;
+    border-radius: 12px;
+    display: inline-block;
+}
+
+/* Notification system */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 25px;
+    color: white;
+    border-radius: 8px;
+    z-index: 10000;
+    animation: slideIn 0.3s ease;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+    font-weight: 600;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    max-width: 350px;
+}
+
+.notification.success {
+    background: linear-gradient(135deg, #00C851, #007E33);
+}
+
+.notification.warning {
+    background: linear-gradient(135deg, #ffbb33, #FF8800);
+}
+
+.notification.error {
+    background: linear-gradient(135deg, #ff4444, #CC0000);
+}
+
+.notification.info {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+}
+
+/* Animations */
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #b0b0b0;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #909090;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .main-panel {
+        flex-direction: column;
+    }
+    
+    .map-container {
+        height: 50vh;
+    }
+    
+    .info-panel {
+        max-height: 40vh;
+    }
+    
+    header h1 {
+        font-size: 1.2rem;
+    }
+    
+    .status-bar {
+        gap: 1rem;
+    }
+    
+    .recenter-button {
+        top: 10px;
+        right: 10px;
+    }
+    
+    .recenter-button button {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+}
+
+/* Loading animation for map */
+.map-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 15px 30px;
+    border-radius: 30px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    z-index: 1000;
+    font-weight: 600;
+    color: #2c3e50;
+    animation: fadeInOut 2s infinite;
+}
+
+@keyframes fadeInOut {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
+}

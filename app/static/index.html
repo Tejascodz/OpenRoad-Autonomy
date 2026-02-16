@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery Robot Dashboard</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="dashboard">
+        <header>
+            <h1>🤖 Autonomous Delivery Robot Control Center</h1>
+            <div class="status-bar">
+                <span id="connection-status">🔴 Disconnected</span>
+                <span id="robot-mode">Mode: IDLE</span>
+            </div>
+        </header>
+
+        <div class="main-panel">
+            <div class="map-container">
+                <div id="map"></div>
+            </div>
+
+            <div class="info-panel">
+                <div class="robot-stats">
+                    <h2>Robot Status</h2>
+                    <div class="stat">
+                        <label>Battery:</label>
+                        <div class="progress-bar">
+                            <div id="battery-fill" class="fill" style="width: 100%"></div>
+                        </div>
+                        <span id="battery-percent">100%</span>
+                    </div>
+                    <div class="stat">
+                        <label>Speed:</label>
+                        <span id="speed">0 km/h</span>
+                    </div>
+                    <div class="stat">
+                        <label>Position:</label>
+                        <span id="position">0.0000, 0.0000</span>
+                    </div>
+                    <div class="stat">
+                        <label>Delivery ID:</label>
+                        <span id="delivery-id">-</span>
+                    </div>
+                    <div class="stat">
+                        <label>Progress:</label>
+                        <div class="progress-bar">
+                            <div id="progress-fill" class="fill" style="width: 0%"></div>
+                        </div>
+                        <span id="progress-percent">0%</span>
+                    </div>
+                </div>
+
+                <div class="delivery-controls">
+                    <h2>Start New Delivery</h2>
+                    <form id="delivery-form">
+                        <div class="form-group">
+                            <label>Pickup Location:</label>
+                            <input type="number" id="pickup-lat" placeholder="Latitude" step="any" required>
+                            <input type="number" id="pickup-lon" placeholder="Longitude" step="any" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Delivery Location:</label>
+                            <input type="number" id="delivery-lat" placeholder="Latitude" step="any" required>
+                            <input type="number" id="delivery-lon" placeholder="Longitude" step="any" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Algorithm:</label>
+                            <select id="algorithm">
+                                <option value="astar">A* (Recommended)</option>
+                                <option value="dijkstra">Dijkstra</option>
+                            </select>
+                        </div>
+                        <button type="submit">Start Delivery</button>
+                    </form>
+                </div>
+
+                <div class="emergency-controls">
+                    <button id="emergency-stop" class="emergency">🛑 EMERGENCY STOP</button>
+                    <button id="resume-mission">▶ Resume</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="history-panel">
+            <h2>Recent Deliveries</h2>
+            <table id="delivery-history">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Pickup</th>
+                        <th>Delivery</th>
+                        <th>Distance</th>
+                        <th>Status</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+                <tbody id="history-body">
+                    <!-- Populated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="/static/js/dashboard.js"></script>
+</body>
+</html>
