@@ -153,14 +153,6 @@ python -c "from app.services.database_service import DatabaseService; DatabaseSe
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-### Access the Application
-
-- **Dashboard**: http://localhost:8000/static/index.html
-- **API Documentation**: http://localhost:8000/docs
-- **Health Check**: http://localhost:8000/health
-
----
-
 ## 🎮 Usage
 
 ### Sample Coordinates (Bangalore, India)
@@ -180,9 +172,6 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 4. Click "Start Delivery"
 5. Watch the robot navigate in real-time!
 
-![Usage Demo](https://via.placeholder.com/600x300?text=Click+Start+Delivery+to+Begin)
-
----
 
 ## 📡 API Reference
 
@@ -198,11 +187,7 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 | GET | `/api/v1/deliveries/history` | Get delivery history |
 | GET | `/api/v1/deliveries/{id}` | Get specific delivery |
 
-### WebSocket
 
-```
-ws://localhost:8000/api/v1/ws/{robot_id}
-```
 
 **Message Types:**
 - `ping` - Keep connection alive
