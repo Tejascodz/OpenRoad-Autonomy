@@ -738,6 +738,6 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 ---
 
-**© 2024 OpenRoad-Autonomy** | [Website](#) | [Documentation](#) | [Report Bug](https://github.com/Tejascodz/OpenRoad-Autonomy/issues) | [Request Feature](https://github.com/Tejascodz/OpenRoad-Autonomy/issues)
+**© 2026 OpenRoad-Autonomy** | [Website](#) | [Documentation](#) | [Report Bug](https://github.com/Tejascodz/OpenRoad-Autonomy/issues) | [Request Feature](https://github.com/Tejascodz/OpenRoad-Autonomy/issues)
 
 </div>
