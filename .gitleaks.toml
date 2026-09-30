@@ -1,0 +1,11 @@
+# gitleaks configuration (used by CI: gitleaks/gitleaks-action, full git history).
+# Keeps every built-in rule; only skips detect-secrets' own baseline file, which
+# stores one-way SHA-1 fingerprints of known test/placeholder values, not secrets.
+title = "OpenRoad-Autonomy gitleaks config"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "detect-secrets baseline (hashes of audited test/placeholder values)"
+paths = ['''^\.secrets\.baseline$''']

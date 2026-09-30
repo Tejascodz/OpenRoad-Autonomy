@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark">
+    <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+    <title>Sign in · OpenRoad</title>
+    <link rel="stylesheet" href="/static/css/app.css">
+    <script src="/static/js/login.js" defer></script>
+</head>
+<body class="login-body">
+    <form id="login-form" class="card login-card" autocomplete="on">
+        <div class="brand"><img src="/static/favicon.svg" alt=""> OpenRoad Autonomy</div>
+        <p>Sign in to the robot control center.</p>
+        <div class="field">
+            <label for="username">Username</label>
+            <input id="username" class="input" name="username" autocomplete="username" maxlength="64" required autofocus>
+        </div>
+        <div class="field">
+            <label for="password">Password</label>
+            <input id="password" class="input" name="password" type="password" autocomplete="current-password" maxlength="128" required>
+        </div>
+        <p id="login-error" class="error" role="alert"></p>
+        <button class="btn primary block" type="submit">Sign in</button>
+    </form>
+</body>
+</html>

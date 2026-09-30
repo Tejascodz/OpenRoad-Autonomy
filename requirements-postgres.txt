@@ -1,0 +1,2 @@
+# Optional PostgreSQL driver (used by docker-compose).
+psycopg[binary]==3.3.6

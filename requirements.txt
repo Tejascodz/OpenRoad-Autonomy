@@ -1,0 +1,15 @@
+# Runtime dependencies (pinned, audited with pip-audit on 2026-09-28).
+# Install: pip install -r requirements.txt
+fastapi==0.141.1
+uvicorn[standard]==0.54.0
+pydantic==2.13.5
+pydantic-settings==2.15.0
+python-multipart==0.0.32
+sqlalchemy==2.1.1
+osmnx==2.1.1
+networkx==3.6.1
+numpy==2.4.6
+argon2-cffi==25.1.0
+pyjwt==2.15.0
+requests==2.34.2
+certifi==2026.7.22

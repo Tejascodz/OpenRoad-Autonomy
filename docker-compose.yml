@@ -1,0 +1,73 @@
+# Production-style stack: nginx (TLS) -> API -> Postgres. Only nginx is published.
+# 1) python scripts/setup_env.py   (creates .env with random secrets)
+# 2) put TLS certs in ./ssl/fullchain.pem and ./ssl/privkey.pem (mkcert for local testing)
+# 3) docker compose up -d --build
+# 4) docker compose exec robot-api python -m app.cli create-user --username admin --role admin
+
+services:
+  robot-api:
+    build: .
+    env_file: .env
+    environment:
+      ENVIRONMENT: production
+      COOKIE_SECURE: "true"
+      HOST: 0.0.0.0
+      LOG_DIR: /tmp/logs   # container logs go to stdout (docker compose logs); file copy on tmpfs
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-robot}:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}@postgres:5432/${POSTGRES_DB:-robotdb}
+    expose:
+      - "8000"            # internal only - not published to the host
+    volumes:
+      - osm-cache:/app/data
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop: [ALL]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks: [backend]
+
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-robot}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-robotdb}
+      POSTGRES_INITDB_ARGS: --auth-host=scram-sha-256
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    networks: [backend]  # no ports: never reachable from outside
+
+  nginx:
+    image: nginx:1.28-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - robot-api
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    networks: [backend]
+
+volumes:
+  postgres-data:
+  osm-cache:
+
+networks:
+  backend:
+    driver: bridge

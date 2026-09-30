@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark">
+    <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+    <title>OpenRoad · Fleet Control</title>
+    <link rel="stylesheet" href="/static/vendor/leaflet/leaflet.css">
+    <link rel="stylesheet" href="/static/css/app.css">
+    <script src="/static/vendor/leaflet/leaflet.js" defer></script>
+    <script src="/static/js/api.js" defer></script>
+    <script src="/static/js/dashboard.js" defer></script>
+</head>
+<body>
+<header class="topbar">
+    <div class="brand"><img src="/static/favicon.svg" alt=""> OpenRoad <small>Fleet Control</small></div>
+    <span id="conn-pill" class="pill bad"><span class="dot"></span><span id="conn-text">Offline</span></span>
+    <span class="pill sim" title="No physical robots are connected. Robot positions, speed and battery come from the built-in simulator.">SIMULATED FLEET</span>
+    <span id="fleet-pill" class="pill"><span class="dot"></span><span id="fleet-text">—</span></span>
+    <span id="map-pill" class="pill"><span class="dot"></span><span id="map-text">Map…</span></span>
+    <div class="spacer"></div>
+    <div id="sim-speed-wrap" class="op-only" title="Simulation speed">
+        <div class="segmented" id="sim-speed">
+            <button type="button" data-v="1">1×</button>
+            <button type="button" data-v="2">2×</button>
+            <button type="button" data-v="5">5×</button>
+            <button type="button" data-v="10">10×</button>
+            <button type="button" data-v="20">20×</button>
+        </div>
+    </div>
+    <button id="estop" class="estop" type="button" title="Emergency stop for every robot (any user)"><span class="sq"></span>STOP ALL</button>
+    <div class="user">
+        <div class="avatar" id="avatar">?</div>
+        <div><div id="user-name">…</div><div class="role" id="user-role"></div></div>
+        <button id="logout-btn" class="btn small" type="button">Log out</button>
+    </div>
+</header>
+
+<main class="stage">
+    <div id="map"></div>
+    <div class="map-tools">
+        <button id="btn-follow" class="btn icon" type="button" title="Follow selected robot">◎</button>
+        <button id="btn-fit" class="btn icon" type="button" title="Show the whole fleet">⤢</button>
+        <button id="btn-theme" class="btn icon" type="button" title="Light / dark map">◐</button>
+    </div>
+
+    <!-- ============ LEFT: new delivery ============ -->
+    <aside class="panel left">
+        <section class="card op-only" id="planner">
+            <h2>New delivery</h2>
+            <div class="place-row">
+                <div class="place">
+                    <span class="marker-dot pickup"></span>
+                    <input id="pickup-input" class="input" placeholder="Pickup — search a place or click 📍" autocomplete="off" maxlength="120">
+                    <button id="pickup-pick" class="btn icon" type="button" title="Pick on map">📍</button>
+                    <div id="pickup-suggest" class="suggest hidden"></div>
+                </div>
+                <div class="connector"></div>
+                <div class="place">
+                    <span class="marker-dot dropoff"></span>
+                    <input id="dropoff-input" class="input" placeholder="Destination — search or click 📍" autocomplete="off" maxlength="120">
+                    <button id="dropoff-pick" class="btn icon" type="button" title="Pick on map">📍</button>
+                    <button id="swap" class="btn icon" type="button" title="Swap">⇅</button>
+                    <div id="dropoff-suggest" class="suggest hidden"></div>
+                </div>
+            </div>
+
+            <div class="label">Robot</div>
+            <select id="robot-select" class="select block">
+                <option value="">Auto — nearest available robot</option>
+            </select>
+
+            <div class="label">Route planner</div>
+            <div class="chips" id="algo-chips">
+                <button type="button" class="chip active" data-v="alt">ALT ★</button>
+                <button type="button" class="chip" data-v="astar">A*</button>
+                <button type="button" class="chip" data-v="dstar_lite">D* Lite</button>
+                <button type="button" class="chip" data-v="dijkstra">Dijkstra</button>
+            </div>
+            <div class="label">Optimise for</div>
+            <div class="chips" id="profile-chips">
+                <button type="button" class="chip active" data-v="fastest">⚡ Fastest</button>
+                <button type="button" class="chip" data-v="safest">🛡 Quieter roads</button>
+                <button type="button" class="chip" data-v="energy">🔋 Energy</button>
+                <button type="button" class="chip" data-v="shortest">📏 Shortest</button>
+            </div>
+
+            <div class="actions">
+                <button id="preview-btn" class="btn" type="button">Preview route</button>
+                <button id="dispatch-btn" class="btn primary" type="button">Dispatch</button>
+            </div>
+            <div id="planner-hint" class="hint"></div>
+            <div id="map-fallback" class="fallback hidden">
+                <strong>Real road map not ready yet.</strong>
+                <span class="muted" id="map-fallback-msg"></span>
+                <div class="inline-form">
+                    <button id="retry-map-btn" class="btn small" type="button">↻ Retry download</button>
+                    <button id="offline-btn" class="btn small" type="button">Use offline demo map</button>
+                </div>
+            </div>
+            <div id="map-online" class="fallback hidden">
+                <span class="muted">Using the offline demo grid (not real streets).</span>
+                <button id="online-btn" class="btn small" type="button">Use real map</button>
+            </div>
+            <div id="routes" class="routes"></div>
+        </section>
+
+        <section class="card viewer-only hidden">
+            <h2>Read-only access</h2>
+            <p class="muted">You can watch the fleet live and use STOP. Ask an admin for the operator role to dispatch deliveries.</p>
+        </section>
+    </aside>
+
+    <!-- ============ RIGHT: fleet ============ -->
+    <aside class="panel right">
+        <section class="card">
+            <h2>Fleet <button id="release-all" class="btn small op-only hidden" type="button">▶ Release all</button></h2>
+            <div id="fleet-list" class="fleet-list"></div>
+        </section>
+
+        <section class="card" id="robot-card">
+            <div class="mission-head">
+                <div>
+                    <div class="m-title" id="rc-title">Select a robot</div>
+                    <div class="muted" id="rc-sub">Click a robot in the list or on the map</div>
+                </div>
+                <span class="status" id="rc-status">—</span>
+            </div>
+            <div class="progress"><div id="rc-progress"></div></div>
+            <div class="mission-foot"><span id="rc-remain">—</span><span id="rc-eta">—</span></div>
+            <dl class="kv">
+                <dt>Speed</dt><dd id="rc-speed">—</dd>
+                <dt>Battery</dt><dd id="rc-batt">—</dd>
+                <dt>Range left</dt><dd id="rc-range">—</dd>
+                <dt>Distance driven</dt><dd id="rc-odo">—</dd>
+            </dl>
+            <div class="row-actions">
+                <button id="rc-stop" class="btn danger" type="button">■ Stop</button>
+                <button id="rc-resume" class="btn op-only" type="button">▶ Release</button>
+                <button id="rc-cancel" class="btn op-only" type="button">✕ Cancel mission</button>
+                <button id="rc-return" class="btn op-only" type="button">⌂ Return to base</button>
+            </div>
+        </section>
+    </aside>
+
+    <!-- ============ BOTTOM dock ============ -->
+    <section class="dock" id="dock">
+        <div class="card">
+            <div class="dock-tabs" id="dock-tabs">
+                <button type="button" class="active" data-tab="events">Events</button>
+                <button type="button" data-tab="history">Deliveries</button>
+                <button type="button" data-tab="admin" class="admin-only">Admin</button>
+                <span class="grow"></span>
+                <button type="button" id="dock-toggle" title="Collapse">▾</button>
+            </div>
+            <div class="dock-body">
+                <div data-pane="events"><ul class="events" id="events"><li class="muted">No events yet.</li></ul></div>
+                <div data-pane="history" class="hidden">
+                    <table>
+                        <thead><tr><th>#</th><th>Robot</th><th>Created</th><th>Distance</th><th>Planner</th><th>Status</th></tr></thead>
+                        <tbody id="history-body"></tbody>
+                    </table>
+                </div>
+                <div data-pane="admin" class="hidden">
+                    <div class="admin-grid">
+                        <div>
+                            <h3 class="sub">Robots</h3>
+                            <table>
+                                <thead><tr><th>Robot</th><th>Name</th><th>Base</th><th></th></tr></thead>
+                                <tbody id="robots-body"></tbody>
+                            </table>
+                            <form id="new-robot-form" class="inline-form" autocomplete="off">
+                                <input id="new-robot-name" class="input" placeholder="name (optional)" pattern="[A-Za-z0-9 _.\-]{1,40}">
+                                <button class="btn small primary" type="submit">＋ Add robot</button>
+                            </form>
+                        </div>
+                        <div>
+                            <h3 class="sub">Users</h3>
+                            <table>
+                                <thead><tr><th>User</th><th>Role</th><th>Status</th><th></th></tr></thead>
+                                <tbody id="users-body"></tbody>
+                            </table>
+                            <form id="new-user-form" class="inline-form" autocomplete="off">
+                                <input id="new-username" class="input" placeholder="username" pattern="[A-Za-z0-9_.\-]{3,64}" required>
+                                <input id="new-password" class="input" type="password" placeholder="password (12+ chars)" minlength="12" maxlength="128" autocomplete="new-password" required>
+                                <select id="new-role" class="select">
+                                    <option value="viewer">viewer</option>
+                                    <option value="operator">operator</option>
+                                    <option value="admin">admin</option>
+                                </select>
+                                <button class="btn small primary" type="submit">Add user</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+</body>
+</html>
